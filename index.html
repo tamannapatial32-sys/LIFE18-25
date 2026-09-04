@@ -1,0 +1,3562 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LIFE 18/25 â€” Practice real-life decisions before they become real-life mistakes</title>
+  <meta name="description" content="An interactive simulation for navigating the decisions that come with becoming independent. Practice real-life financial decisions using webcam hand gestures.">
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <style>
+/* ==========================================================================
+   LIFE 18/25 - Modern Interactive Simulation Design System
+   ========================================================================== */
+
+:root {
+  --bg-main: #0a0d14;
+  --bg-surface: #111726;
+  --bg-card: rgba(22, 30, 49, 0.75);
+  --bg-card-hover: rgba(28, 38, 62, 0.9);
+  --bg-elevated: #1a2238;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(99, 102, 241, 0.5);
+  --border-emerald: rgba(16, 185, 129, 0.5);
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-inverse: #0b0f19;
+
+  --accent-primary: #6366f1;
+  --accent-primary-hover: #4f46e5;
+  --accent-emerald: #10b981;
+  --accent-emerald-dim: rgba(16, 185, 129, 0.15);
+  --accent-amber: #f59e0b;
+  --accent-rose: #f43f5e;
+  --accent-cyan: #06b6d4;
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.45);
+  --shadow-glow: 0 0 35px -5px rgba(99, 102, 241, 0.35);
+  --shadow-emerald: 0 0 30px -5px rgba(16, 185, 129, 0.4);
+
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Reset & Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: var(--font-sans);
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(circle at 50% 0%, #171d33 0%, #0a0d14 70%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  overflow-x: hidden;
+}
+
+/* Helpers */
+.hidden {
+  display: none !important;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Top App Header / Financial Ticker */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(10, 13, 20, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0.75rem 1.5rem;
+  transition: all var(--transition-normal);
+}
+
+.header-container {
+  max-width: 1240px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand-logo {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #ffffff 40%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.header-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.progress-dots {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.progress-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  transition: all var(--transition-normal);
+}
+
+.progress-dot.active {
+  background: var(--accent-primary);
+  color: #fff;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.5);
+  transform: scale(1.1);
+}
+
+.progress-dot.completed {
+  background: var(--accent-emerald-dim);
+  color: var(--accent-emerald);
+  border-color: var(--accent-emerald);
+}
+
+.scenario-counter {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.header-finances {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.finance-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.finance-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.finance-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.finance-value.remaining {
+  color: var(--accent-emerald);
+}
+
+.finance-value.spent {
+  color: var(--text-secondary);
+}
+
+.finance-value.pulse {
+  transform: scale(1.15);
+}
+
+.btn-icon-header {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-icon-header:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+}
+
+/* Main Container */
+.main-wrapper {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Screen transition container */
+.screen-view {
+  animation: fadeIn 0.35s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   Screen 1: Landing Page
+   ========================================================================== */
+.landing-hero {
+  min-height: 75vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 2rem 0;
+}
+
+.landing-tagline-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #c7d2fe;
+  margin-bottom: 1.75rem;
+}
+
+.landing-title {
+  font-size: clamp(3rem, 7vw, 5rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  margin-bottom: 1.25rem;
+  background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 80%, #6366f1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.landing-subtitle {
+  font-size: clamp(1.2rem, 2.8vw, 1.65rem);
+  font-weight: 600;
+  color: #f1f5f9;
+  line-height: 1.35;
+  margin-bottom: 1.25rem;
+  max-width: 680px;
+}
+
+.landing-support-text {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 620px;
+  margin-bottom: 2.5rem;
+}
+
+.landing-cta-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 3.5rem;
+}
+
+.btn-primary-glow {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: #ffffff;
+  border: none;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 1.1rem 2.75rem;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 0 25px rgba(99, 102, 241, 0.45);
+  transition: all var(--transition-normal);
+}
+
+.btn-primary-glow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 35px rgba(99, 102, 241, 0.65);
+}
+
+.btn-primary-glow:active {
+  transform: translateY(1px);
+}
+
+.landing-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Gesture Teaser Strip */
+.gesture-strip {
+  width: 100%;
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 2rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.gesture-strip-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+.gesture-cards-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.gesture-intro-card {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.9rem 1.1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  text-align: left;
+}
+
+.gesture-intro-icon {
+  font-size: 1.8rem;
+}
+
+.gesture-intro-info strong {
+  display: block;
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+.gesture-intro-info span {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   Screen 2: Salary Breakdown Context
+   ========================================================================== */
+.salary-intro-card {
+  max-width: 760px;
+  margin: 1.5rem auto 0;
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+.salary-intro-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.salary-user-tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--accent-emerald);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 0.3rem 0.9rem;
+  border-radius: var(--radius-full);
+  margin-bottom: 0.8rem;
+}
+
+.salary-intro-title {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.5rem;
+}
+
+.salary-intro-desc {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.salary-figures-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.figure-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.figure-box.highlight {
+  background: rgba(16, 185, 129, 0.06);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.figure-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.figure-amount {
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.figure-amount.gross {
+  color: #fff;
+}
+
+.figure-amount.remaining {
+  color: var(--accent-emerald);
+}
+
+.figure-sub {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 0.3rem;
+}
+
+.fixed-expenses-wrapper {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.fixed-expenses-title {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.fixed-expenses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.fixed-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.95rem;
+}
+
+.fixed-item-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.fixed-item-icon {
+  font-size: 1.1rem;
+}
+
+.fixed-item-label {
+  color: #e2e8f0;
+}
+
+.fixed-item-amount {
+  font-weight: 600;
+  color: #94a3b8;
+  font-variant-numeric: tabular-nums;
+}
+
+.salary-intro-cta {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.camera-permission-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Screen 3: Main Simulation (Scenario & Webcam Stage)
+   ========================================================================== */
+.simulation-stage {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+/* Scenario Left Column */
+.scenario-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.scenario-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-md);
+}
+
+.scenario-header-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.scenario-category-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #818cf8;
+  background: rgba(99, 102, 241, 0.12);
+  padding: 0.3rem 0.8rem;
+  border-radius: var(--radius-full);
+}
+
+.scenario-title {
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.25rem;
+  color: #fff;
+}
+
+.scenario-prompt {
+  font-size: 1.05rem;
+  color: #cbd5e1;
+  line-height: 1.65;
+  margin-bottom: 1rem;
+}
+
+.scenario-prompt p {
+  margin-bottom: 0.75rem;
+}
+
+.scenario-prompt p:last-child {
+  margin-bottom: 0;
+}
+
+/* Options Container */
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.option-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.4rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  overflow: hidden;
+}
+
+.option-card:hover {
+  background: var(--bg-card-hover);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Active gesture target animation */
+.option-card.gesture-targeted {
+  border-color: var(--accent-emerald);
+  background: rgba(16, 185, 129, 0.08);
+  box-shadow: var(--shadow-emerald);
+  transform: scale(1.02);
+}
+
+.option-card-progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: var(--hold-progress, 0%);
+  background: linear-gradient(90deg, #10b981, #34d399);
+  transition: width 0.05s linear;
+}
+
+.option-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.option-key-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+}
+
+.option-gesture-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.option-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.2rem;
+}
+
+.option-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.option-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.8rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.option-cost-tag {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--accent-rose);
+  font-variant-numeric: tabular-nums;
+}
+
+.option-cost-tag.free {
+  color: var(--accent-emerald);
+}
+
+.option-gesture-instruction {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Camera & Gesture HUD Column (Right)
+   ========================================================================== */
+.camera-column {
+  position: sticky;
+  top: 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.camera-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  text-align: center;
+}
+
+.camera-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.camera-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+}
+
+.status-badge.active {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--accent-emerald);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.status-badge.warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--accent-amber);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* Webcam Preview Box */
+.webcam-viewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-width: 280px;
+  margin: 0 auto 1rem;
+  background: #000;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.webcam-viewport canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  transform: scaleX(-1); /* Mirror canvas */
+}
+
+.camera-crosshair {
+  position: absolute;
+  inset: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+}
+
+/* Camera HUD Status & Hold Ring */
+.camera-hud {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.camera-status-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  min-height: 1.5rem;
+}
+
+.detected-gesture-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  padding: 0.35rem 0.9rem;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  color: #6ee7b7;
+  animation: pulsePill 1.5s infinite;
+}
+
+@keyframes pulsePill {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.3); }
+  70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.detect-icon {
+  font-size: 1.1rem;
+}
+
+/* Hold Countdown Bar */
+.hold-progress-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-top: 0.25rem;
+}
+
+.hold-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #10b981, #059669);
+  transition: width 0.08s linear;
+}
+
+.hold-progress-fill.confirmed {
+  background: #34d399;
+}
+
+/* Gesture Cheat Sheet Strip */
+.gesture-guide-box {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-top: 0.5rem;
+}
+
+.guide-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.guide-row:last-child {
+  border-bottom: none;
+}
+
+.guide-gesture {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #e2e8f0;
+  font-weight: 500;
+}
+
+.guide-option {
+  font-weight: 700;
+  color: #a5b4fc;
+}
+
+/* Camera Actions Row */
+.camera-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.btn-secondary-sm {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-secondary-sm:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+/* Simulation Test Tools (A/B/C gesture buttons for testing) */
+.test-simulator-box {
+  background: rgba(99, 102, 241, 0.06);
+  border: 1px dashed rgba(99, 102, 241, 0.25);
+  border-radius: var(--radius-md);
+  padding: 0.8rem;
+  text-align: center;
+}
+
+.test-simulator-title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #a5b4fc;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.test-buttons-row {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.sim-gesture-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-subtle);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all var(--transition-fast);
+}
+
+.sim-gesture-btn:hover {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
+/* Camera Error / Missing Banner */
+.camera-error-box {
+  background: rgba(244, 63, 94, 0.1);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  color: #fda4af;
+  border-radius: var(--radius-md);
+  padding: 0.9rem;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  text-align: left;
+}
+
+/* ==========================================================================
+   Consequence Modal Overlay
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: fadeIn 0.25s ease forwards;
+}
+
+.consequence-modal-card {
+  max-width: 580px;
+  width: 100%;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 2.25rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.consequence-top {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.consequence-icon-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.consequence-headline {
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #fff;
+  line-height: 1.25;
+}
+
+.consequence-choice-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+.badge-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--text-muted);
+}
+
+.consequence-description-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  color: #cbd5e1;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.consequence-balance-tracker {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.75rem;
+  text-align: center;
+}
+
+.tracker-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.tracker-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.tracker-val {
+  font-size: 1.15rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.tracker-val.cost {
+  color: var(--accent-rose);
+}
+
+.tracker-val.remaining {
+  color: var(--accent-emerald);
+}
+
+.tracker-arrow {
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  font-weight: 300;
+}
+
+.consequence-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ==========================================================================
+   Screen 4: Profile Results Page
+   ========================================================================== */
+.results-card {
+  max-width: 880px;
+  margin: 0 auto;
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+.results-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.results-super-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent-emerald);
+  margin-bottom: 0.5rem;
+}
+
+.results-main-title {
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 0.85rem;
+  background: linear-gradient(135deg, #ffffff 40%, #c7d2fe 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.persona-badge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  padding: 0.6rem 1.5rem;
+  border-radius: var(--radius-md);
+  margin-top: 0.5rem;
+}
+
+.persona-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.persona-sub {
+  font-size: 0.85rem;
+  color: #c7d2fe;
+}
+
+/* 4 Pillars Grid */
+.pillars-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.pillar-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.pillar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.pillar-icon {
+  font-size: 1.2rem;
+}
+
+.pillar-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  flex: 1;
+  margin-left: 0.5rem;
+}
+
+.pillar-score {
+  font-size: 0.95rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.score-high {
+  color: var(--accent-emerald);
+}
+
+.score-mid {
+  color: var(--accent-amber);
+}
+
+.score-low {
+  color: var(--accent-rose);
+}
+
+.pillar-meter-bg {
+  width: 100%;
+  height: 7px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+.pillar-meter-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pillar-meter-fill.score-high {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.pillar-meter-fill.score-mid {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.pillar-meter-fill.score-low {
+  background: linear-gradient(90deg, #f43f5e, #fb7185);
+}
+
+.pillar-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+/* Qualitative Highlights (Strongest vs Improvement) */
+.highlights-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.highlight-box {
+  border-radius: var(--radius-md);
+  padding: 1.4rem;
+  border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.highlight-box.strength-box {
+  background: rgba(16, 185, 129, 0.05);
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+.highlight-box.improve-box {
+  background: rgba(99, 102, 241, 0.05);
+  border-color: rgba(99, 102, 241, 0.25);
+}
+
+.highlight-badge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.75rem;
+}
+
+.highlight-badge.strength {
+  color: var(--accent-emerald);
+}
+
+.highlight-badge.improve {
+  color: #a5b4fc;
+}
+
+.highlight-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.highlight-title h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.highlight-feedback {
+  font-size: 0.88rem;
+  color: #cbd5e1;
+  line-height: 1.55;
+}
+
+/* Financial Summary Bar */
+.results-finance-summary {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.75rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.summary-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.summary-val {
+  font-size: 1.25rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+
+.summary-val.remaining {
+  color: var(--accent-emerald);
+}
+
+/* Decision Timeline */
+.timeline-section {
+  margin-bottom: 2.25rem;
+}
+
+.timeline-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.timeline-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1.15rem;
+}
+
+.timeline-step {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  width: 95px;
+}
+
+.timeline-choice-info {
+  flex: 1;
+  margin: 0 1rem;
+}
+
+.timeline-choice-info strong {
+  display: block;
+  font-size: 0.9rem;
+  color: #fff;
+}
+
+.timeline-selection {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.15rem;
+}
+
+.timeline-gesture-tag {
+  font-size: 0.7rem;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.timeline-impact {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.timeline-cost {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent-rose);
+  font-variant-numeric: tabular-nums;
+}
+
+.timeline-rem {
+  font-size: 0.75rem;
+  color: var(--accent-emerald);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Educational Disclaimer */
+.disclaimer-banner {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.9rem 1.25rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Results Actions */
+.results-actions {
+  display: flex;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   Model Settings Modal
+   ========================================================================== */
+.model-modal-card {
+  max-width: 540px;
+  width: 100%;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+}
+
+.model-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.model-modal-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.btn-close-modal {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.modal-section-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.input-field {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 0.9rem;
+  color: #fff;
+  font-size: 0.85rem;
+  margin-bottom: 0.6rem;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.file-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.file-input-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+}
+
+.file-input-row label {
+  color: var(--text-secondary);
+}
+
+.file-input-row input {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Responsive Adaptations
+   ========================================================================== */
+@media (max-width: 900px) {
+  .simulation-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .camera-column {
+    position: static;
+    order: -1; /* Display camera above or beside on tablet */
+  }
+
+  .gesture-cards-row {
+    grid-template-columns: 1fr;
+  }
+
+  .pillars-grid,
+  .highlights-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .results-finance-summary {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .header-container {
+    flex-wrap: wrap;
+  }
+
+  .header-progress {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+
+  .salary-figures-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .salary-intro-card,
+  .scenario-card,
+  .results-card {
+    padding: 1.5rem;
+  }
+
+  .consequence-balance-tracker {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .tracker-arrow {
+    transform: rotate(90deg);
+  }
+}
+
+</style>
+  
+  <!-- Favicon / Meta -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>ðŸŒ±</text></svg>">
+</head>
+<body>
+
+  <!-- Top App Bar / Financial Status -->
+  <header class="app-header hidden" id="app-header">
+    <div class="header-container">
+      <div class="header-brand">
+        <span class="brand-logo">LIFE 18/25</span>
+        <span class="brand-badge">Your First Salary</span>
+      </div>
+
+      <div class="header-progress">
+        <div class="progress-dots" id="progress-dots">
+          <!-- Rendered via JS -->
+        </div>
+        <span class="scenario-counter" id="scenario-counter-text">Scenario 1 of 4</span>
+      </div>
+
+      <div class="header-finances">
+        <div class="finance-pill">
+          <span class="finance-label">Remaining Balance</span>
+          <span class="finance-value remaining tabular" id="header-balance-value">â‚¹15,000</span>
+        </div>
+        <div class="finance-pill">
+          <span class="finance-label">Spent This Month</span>
+          <span class="finance-value spent tabular" id="header-spent-value">â‚¹0</span>
+        </div>
+        <button type="button" class="btn-icon-header" id="btn-open-model-modal" title="Model & Camera Settings">
+          âš™ï¸
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Wrapper -->
+  <main class="main-wrapper">
+
+    <!-- ====================================================================
+         SCREEN 1: LANDING PAGE
+         ==================================================================== -->
+    <section class="screen-view active" id="screen-landing">
+      <div class="landing-hero">
+        <div class="landing-tagline-badge">
+          <span>âœ¨</span> Interactive Simulation Prototype
+        </div>
+
+        <h1 class="landing-title">LIFE 18/25</h1>
+        <h2 class="landing-subtitle">Practice real-life decisions before they become real-life mistakes.</h2>
+        <p class="landing-support-text">
+          An interactive simulation for navigating the decisions that come with becoming independent.
+        </p>
+
+        <div class="landing-cta-container">
+          <button type="button" class="btn-primary-glow" id="btn-start-simulation">
+            START SIMULATION
+            <span class="arrow">â†’</span>
+          </button>
+          <span class="landing-note">Prototype â€” Your First Salary</span>
+        </div>
+
+        <!-- Gesture Teaser Strip -->
+        <div class="gesture-strip">
+          <div class="gesture-strip-title">Powered by Teachable Machine Webcam Gestures</div>
+          <div class="gesture-cards-row">
+            <div class="gesture-intro-card">
+              <span class="gesture-intro-icon">ðŸ‘</span>
+              <div class="gesture-intro-info">
+                <strong>Thumbs Up</strong>
+                <span>Chooses Option A</span>
+              </div>
+            </div>
+            <div class="gesture-intro-card">
+              <span class="gesture-intro-icon">âœ‹</span>
+              <div class="gesture-intro-info">
+                <strong>Open Palm</strong>
+                <span>Chooses Option B</span>
+              </div>
+            </div>
+            <div class="gesture-intro-card">
+              <span class="gesture-intro-icon">âœŠ</span>
+              <div class="gesture-intro-info">
+                <strong>Closed Fist</strong>
+                <span>Chooses Option C</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SCREEN 2: SALARY BREAKDOWN CONTEXT
+         ==================================================================== -->
+    <section class="screen-view hidden" id="screen-salary-intro">
+      <div class="salary-intro-card">
+        <div class="salary-intro-header">
+          <div class="salary-user-tag">Persona: 22 Years Old â€¢ First Job</div>
+          <h2 class="salary-intro-title">Your First Salary Has Arrived</h2>
+          <p class="salary-intro-desc">
+            You just received your first monthly paycheck of <strong>â‚¹30,000</strong>. Before planning fun expenses, your non-negotiable adult essentials are deducted.
+          </p>
+        </div>
+
+        <div class="salary-figures-grid">
+          <div class="figure-box">
+            <span class="figure-label">Gross Monthly Pay</span>
+            <span class="figure-amount gross tabular">â‚¹30,000</span>
+            <span class="figure-sub">Deposited to your account</span>
+          </div>
+          <div class="figure-box highlight">
+            <span class="figure-label">Remaining Discretionary</span>
+            <span class="figure-amount remaining tabular" id="intro-remaining-amount">â‚¹15,000</span>
+            <span class="figure-sub">Your monthly decision budget</span>
+          </div>
+        </div>
+
+        <div class="fixed-expenses-wrapper">
+          <div class="fixed-expenses-title">
+            <span>Essential Monthly Deductions</span>
+            <span id="intro-total-fixed">â‚¹15,000</span>
+          </div>
+          <div class="fixed-expenses-list" id="fixed-expenses-list">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <div class="salary-intro-cta">
+          <button type="button" class="btn-primary-glow" id="btn-proceed-to-sim">
+            Begin Decision 1 (Treat Yourself)
+            <span class="arrow">â†’</span>
+          </button>
+          <span class="camera-permission-hint">
+            ðŸ“· Camera permission will be requested for gesture recognition. All processing happens 100% locally in your browser.
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SCREEN 3: SCENARIO & WEBCAM INTERACTIVE STAGE
+         ==================================================================== -->
+    <section class="screen-view hidden" id="screen-simulation">
+      <div class="simulation-stage">
+        
+        <!-- Left: Scenario & Options Column -->
+        <div class="scenario-column">
+          <div class="scenario-card">
+            <div class="scenario-header-strip">
+              <span class="scenario-category-tag" id="scenario-category-badge">Discretionary Spending</span>
+              <span class="option-gesture-instruction">Hold hand gesture for 1.2s to confirm</span>
+            </div>
+
+            <h2 class="scenario-title" id="scenario-title">Scenario 1 â€” Treat Yourself</h2>
+            <div class="scenario-prompt" id="scenario-prompt">
+              <!-- Prompt inserted by JS -->
+            </div>
+
+            <div class="options-list" id="options-container">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Webcam & Gesture HUD Column -->
+        <div class="camera-column">
+          <div class="camera-card">
+            <div class="camera-card-header">
+              <span class="camera-title">
+                <span>ðŸ“¹</span> Camera Preview
+              </span>
+              <span class="status-badge active" id="model-status-badge">Webcam Active</span>
+            </div>
+
+            <!-- Webcam Viewport -->
+            <div class="webcam-viewport">
+              <div id="webcam-container"></div>
+              <div class="camera-crosshair"></div>
+            </div>
+
+            <!-- Teachable Machine Label Container (Supplied in snippet) -->
+            <div id="label-container" class="hidden"></div>
+
+            <!-- Camera Feedback HUD -->
+            <div class="camera-hud">
+              <div class="camera-status-text" id="camera-status-text">
+                Show your choice to the camera
+              </div>
+
+              <div class="detected-gesture-pill hidden" id="detected-gesture-pill">
+                <span class="detect-icon">ðŸ‘</span>
+                <span class="detect-text">Detected: Thumbs Up â€” 94% confidence</span>
+              </div>
+
+              <!-- Hold Confirmation Progress -->
+              <div class="hold-progress-track">
+                <div class="hold-progress-fill" id="hold-progress-fill"></div>
+              </div>
+            </div>
+
+            <!-- Gesture Cheat Sheet -->
+            <div class="gesture-guide-box">
+              <div class="guide-row">
+                <div class="guide-gesture"><span>ðŸ‘</span> <span>Thumbs Up</span></div>
+                <div class="guide-option">Option A</div>
+              </div>
+              <div class="guide-row">
+                <div class="guide-gesture"><span>âœ‹</span> <span>Open Palm</span></div>
+                <div class="guide-option">Option B</div>
+              </div>
+              <div class="guide-row">
+                <div class="guide-gesture"><span>âœŠ</span> <span>Closed Fist</span></div>
+                <div class="guide-option">Option C</div>
+              </div>
+            </div>
+
+            <!-- Actions Row -->
+            <div class="camera-actions-row">
+              <button type="button" class="btn-secondary-sm" id="btn-retry-gesture">
+                ðŸ”„ Reset Gesture
+              </button>
+            </div>
+
+            <!-- Test Gesture Simulator Bar (Convenient testing without fatigue) -->
+            <div class="test-simulator-box" style="margin-top: 0.85rem;">
+              <div class="test-simulator-title">Test Gestures / Quick Keys</div>
+              <div class="test-buttons-row">
+                <button type="button" class="sim-gesture-btn" data-gesture="A" title="Key [A]">
+                  ðŸ‘ Thumbs Up (A)
+                </button>
+                <button type="button" class="sim-gesture-btn" data-gesture="B" title="Key [B]">
+                  âœ‹ Palm (B)
+                </button>
+                <button type="button" class="sim-gesture-btn" data-gesture="C" title="Key [C]">
+                  âœŠ Fist (C)
+                </button>
+              </div>
+            </div>
+
+            <!-- Camera Error Box (Conditional) -->
+            <div class="camera-error-box hidden" id="camera-error-box" style="margin-top: 1rem;"></div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         CONSEQUENCE MODAL OVERLAY
+         ==================================================================== -->
+    <div class="modal-backdrop hidden" id="consequence-modal">
+      <div class="consequence-modal-card">
+        <div class="consequence-top">
+          <div class="consequence-icon-circle" id="consequence-icon">ðŸ‘</div>
+          <div>
+            <h3 class="consequence-headline" id="consequence-headline">Choice Made</h3>
+            <div class="consequence-choice-badge" id="consequence-choice-badge">
+              Option Selected
+            </div>
+          </div>
+        </div>
+
+        <div class="consequence-description-box" id="consequence-description">
+          <!-- Consequence narrative text -->
+        </div>
+
+        <div class="consequence-balance-tracker">
+          <div class="tracker-item">
+            <span class="tracker-label">Starting</span>
+            <span class="tracker-val tabular" id="consequence-old-balance">â‚¹15,000</span>
+          </div>
+          <div class="tracker-arrow">âˆ’</div>
+          <div class="tracker-item">
+            <span class="tracker-label">Choice Impact</span>
+            <span class="tracker-val cost tabular" id="consequence-cost">-â‚¹8,000</span>
+          </div>
+          <div class="tracker-arrow">=</div>
+          <div class="tracker-item">
+            <span class="tracker-label">Remaining</span>
+            <span class="tracker-val remaining tabular" id="consequence-new-balance">â‚¹7,000</span>
+          </div>
+        </div>
+
+        <div class="consequence-actions">
+          <button type="button" class="btn-primary-glow" id="btn-next-scenario">
+            Continue to Scenario 2 <span class="arrow">â†’</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         SCREEN 4: FINAL DECISION PROFILE
+         ==================================================================== -->
+    <section class="screen-view hidden" id="screen-result">
+      <div class="results-card">
+        <div class="results-header">
+          <span class="results-super-title">SIMULATION COMPLETE</span>
+          <h2 class="results-main-title">YOUR LIFE DECISION PROFILE</h2>
+          <div class="persona-badge">
+            <span class="persona-title" id="profile-archetype-title">The Balanced Navigator</span>
+            <span class="persona-sub" id="profile-archetype-subtitle">You weigh enjoyment today with sensible preparedness for tomorrow.</span>
+          </div>
+        </div>
+
+        <!-- 4 Pillars Grid -->
+        <div class="pillars-grid" id="profile-pillars-grid">
+          <!-- Financial Awareness, Spending Control, Risk Awareness, Emergency Planning -->
+        </div>
+
+        <!-- Highlights: Strongest Area & Area to Improve -->
+        <div class="highlights-grid">
+          <div class="highlight-box strength-box" id="profile-strongest-box">
+            <!-- Strongest area -->
+          </div>
+          <div class="highlight-box improve-box" id="profile-improve-box">
+            <!-- Area to improve -->
+          </div>
+        </div>
+
+        <!-- Financial Summary Bar -->
+        <div class="results-finance-summary">
+          <div class="summary-col">
+            <span class="summary-label">Gross Salary</span>
+            <span class="summary-val tabular">â‚¹30,000</span>
+          </div>
+          <div class="summary-col">
+            <span class="summary-label">Fixed Essentials</span>
+            <span class="summary-val tabular" id="profile-fixed-total">â‚¹15,000</span>
+          </div>
+          <div class="summary-col">
+            <span class="summary-label">Discretionary Spent</span>
+            <span class="summary-val tabular" id="profile-total-spent">â‚¹0</span>
+          </div>
+          <div class="summary-col">
+            <span class="summary-label">Carried to Savings</span>
+            <span class="summary-val remaining tabular" id="profile-final-balance">â‚¹15,000</span>
+          </div>
+        </div>
+
+        <!-- Timeline of Choices -->
+        <div class="timeline-section">
+          <div class="timeline-title">Scenario Decision Log</div>
+          <div class="timeline-list" id="profile-timeline-list">
+            <!-- Timeline items -->
+          </div>
+        </div>
+
+        <!-- Educational Disclaimer Banner -->
+        <div class="disclaimer-banner">
+          â„¹ï¸ <strong>Educational Note:</strong> This prototype is an interactive simulation designed to help young adults reflect on discretionary spending and habit formation. It does not constitute professional financial advice.
+        </div>
+
+        <!-- Restart Action -->
+        <div class="results-actions">
+          <button type="button" class="btn-primary-glow" id="btn-restart-sim">
+            ðŸ”„ RESTART SIMULATION
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ====================================================================
+       MODEL & CAMERA SETTINGS MODAL
+       ==================================================================== -->
+  <div class="modal-backdrop hidden" id="model-settings-modal">
+    <div class="model-modal-card">
+      <div class="model-modal-header">
+        <h3>Teachable Machine Settings</h3>
+        <button type="button" class="btn-close-modal" id="btn-close-model-modal">âœ•</button>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <div class="modal-section-title">Option 1: Teachable Machine Cloud URL</div>
+        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+          Trained a model on Teachable Machine? Paste your uploaded model URL below:
+        </p>
+        <input type="text" class="input-field" id="input-custom-model-url" placeholder="https://teachablemachine.withgoogle.com/models/abc123xyz/">
+        <button type="button" class="btn-secondary-sm" id="btn-apply-custom-url">Apply URL</button>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <div class="modal-section-title">Option 2: Upload Exported Model Files Directly</div>
+        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+          Select your exported TensorFlow.js files (no server upload required):
+        </p>
+        <div class="file-input-group">
+          <div class="file-input-row">
+            <label>model.json:</label>
+            <input type="file" id="file-model-json" accept=".json">
+          </div>
+          <div class="file-input-row">
+            <label>weights.bin:</label>
+            <input type="file" id="file-weights-bin" accept=".bin">
+          </div>
+          <div class="file-input-row">
+            <label>metadata.json:</label>
+            <input type="file" id="file-metadata-json" accept=".json">
+          </div>
+        </div>
+        <button type="button" class="btn-secondary-sm" id="btn-upload-model-files">Load Selected Files</button>
+      </div>
+
+      <div>
+        <div class="modal-section-title">Option 3: Default Local Directory</div>
+        <p style="font-size: 0.8rem; color: var(--text-muted);">
+          Place exported files inside the local <code>./my_model/</code> folder and reload the page.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Teachable Machine & TensorFlow.js Scripts (Supplied in prompt) -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+
+  <!-- All-In-One Bundled Application Scripts for Vercel/GitHub Deployment -->
+  <script>
+  /**
+ * LIFE 18/25 - Scenario Definitions & Financial Logic
+ */
+
+const INITIAL_FINANCES = {
+  age: 22,
+  grossSalary: 30000,
+  fixedExpenses: [
+    { label: 'Rent', amount: 8000, icon: 'ðŸ ' },
+    { label: 'Food & Groceries', amount: 4000, icon: 'ðŸ²' },
+    { label: 'Transport / Commute', amount: 2000, icon: 'ðŸš‡' },
+    { label: 'Phone & Internet', amount: 1000, icon: 'ðŸ“¶' }
+  ],
+  totalFixed: 15000,
+  initialRemaining: 15000
+};
+
+// Format currency as Indian Rupee (e.g. â‚¹15,000)
+function formatINR(amount) {
+  const rounded = Math.round(amount);
+  const isNegative = rounded < 0;
+  const absVal = Math.abs(rounded);
+  
+  const formatted = absVal.toLocaleString('en-IN');
+  return (isNegative ? '-â‚¹' : 'â‚¹') + formatted;
+}
+
+const SCENARIOS = [
+  {
+    id: 1,
+    title: 'Treat Yourself',
+    subtitle: 'Scenario 1 of 4',
+    prompt: "You've received your first salary.\n\nYou have â‚¹15,000 left after your essential expenses.\n\nYou've wanted a pair of headphones for months. They cost â‚¹8,000.\n\nWhat do you do?",
+    category: 'Discretionary Spending & Impulse Control',
+    options: [
+      {
+        key: 'A',
+        gesture: 'Thumbs Up',
+        gestureIcon: 'ðŸ‘',
+        title: 'Buy them',
+        subtitle: 'Spend â‚¹8,000',
+        cost: 8000,
+        calculateCost: (currentBalance) => 8000,
+        consequenceHeadline: 'Purchased Premium Headphones',
+        consequenceDescription: "You treated yourself to the headphones! They sound fantastic and bring instant gratification. However, spending â‚¹8,000 immediately leaves you with only â‚¹7,000 for any other plans or surprises this month.",
+        scoreImpact: {
+          spendingControl: -18,
+          financialAwareness: -5,
+          riskAwareness: -12,
+          emergencyPlanning: -15
+        }
+      },
+      {
+        key: 'B',
+        gesture: 'Open Palm',
+        gestureIcon: 'âœ‹',
+        title: "Don't buy them",
+        subtitle: 'Keep â‚¹15,000',
+        cost: 0,
+        calculateCost: (currentBalance) => 0,
+        consequenceHeadline: 'Exercised Full Discipline',
+        consequenceDescription: "You resisted the immediate temptation and preserved your full â‚¹15,000 balance. While it requires patience, you can always plan ahead and set aside a smaller portion over 2â€“3 months.",
+        scoreImpact: {
+          spendingControl: +22,
+          financialAwareness: +12,
+          riskAwareness: +15,
+          emergencyPlanning: +20
+        }
+      },
+      {
+        key: 'C',
+        gesture: 'Closed Fist',
+        gestureIcon: 'âœŠ',
+        title: 'Find a cheaper alternative',
+        subtitle: 'Spend â‚¹3,000',
+        cost: 3000,
+        calculateCost: (currentBalance) => 3000,
+        consequenceHeadline: 'A Smart Value Compromise',
+        consequenceDescription: "You bought a high-rated, budget-friendly pair for â‚¹3,000. You satisfied your music fix without blowing your budget, retaining a healthy â‚¹12,000 cushion.",
+        scoreImpact: {
+          spendingControl: +12,
+          financialAwareness: +22,
+          riskAwareness: +10,
+          emergencyPlanning: +10
+        }
+      }
+    ]
+  },
+  {
+    id: 2,
+    title: 'Weekend Trip',
+    subtitle: 'Scenario 2 of 4',
+    prompt: "Your friends are planning a weekend trip.\n\nYour share will cost â‚¹4,000.\n\nWhat do you do?",
+    category: 'Social Pressures & Lifestyle Spending',
+    options: [
+      {
+        key: 'A',
+        gesture: 'Thumbs Up',
+        gestureIcon: 'ðŸ‘',
+        title: 'Go on the trip',
+        subtitle: 'Spend â‚¹4,000',
+        cost: 4000,
+        calculateCost: (currentBalance) => 4000,
+        consequenceHeadline: 'Joined the Road Trip',
+        consequenceDescription: "You decided to go! You had a blast making memories with your friends. Experiences have genuine value, but social outings can quickly eat away at your monthly buffer.",
+        scoreImpact: {
+          spendingControl: -12,
+          financialAwareness: +2,
+          riskAwareness: -8,
+          emergencyPlanning: -10
+        }
+      },
+      {
+        key: 'B',
+        gesture: 'Open Palm',
+        gestureIcon: 'âœ‹',
+        title: 'Skip the trip',
+        subtitle: 'Spend â‚¹0',
+        cost: 0,
+        calculateCost: (currentBalance) => 0,
+        consequenceHeadline: 'Sat Out to Protect Your Budget',
+        consequenceDescription: "You politely bowed out of the getaway. While the FOMO was real for a couple of days, you avoided burning â‚¹4,000 and prioritized your peace of mind.",
+        scoreImpact: {
+          spendingControl: +18,
+          financialAwareness: +10,
+          riskAwareness: +14,
+          emergencyPlanning: +15
+        }
+      },
+      {
+        key: 'C',
+        gesture: 'Closed Fist',
+        gestureIcon: 'âœŠ',
+        title: 'Suggest a cheaper alternative',
+        subtitle: 'Spend â‚¹1,500',
+        cost: 1500,
+        calculateCost: (currentBalance) => 1500,
+        consequenceHeadline: 'Proposed a Budget Hangout',
+        consequenceDescription: "You pitched a local day hike and potluck picnic instead. Several friends were secretly relieved to save money too! You had fun for just â‚¹1,500 instead of â‚¹4,000.",
+        scoreImpact: {
+          spendingControl: +14,
+          financialAwareness: +24,
+          riskAwareness: +10,
+          emergencyPlanning: +8
+        }
+      }
+    ]
+  },
+  {
+    id: 3,
+    title: 'Unexpected Expense',
+    subtitle: 'Scenario 3 of 4',
+    prompt: "Your laptop charger stops working.\n\nA replacement costs â‚¹2,500.\n\nHow will you handle it?",
+    category: 'Emergency Management & Unplanned Bills',
+    options: [
+      {
+        key: 'A',
+        gesture: 'Thumbs Up',
+        gestureIcon: 'ðŸ‘',
+        title: 'Buy the replacement immediately',
+        subtitle: 'Spend â‚¹2,500',
+        cost: 2500,
+        calculateCost: (currentBalance) => 2500,
+        consequenceHeadline: 'Purchased Official OEM Charger',
+        consequenceDescription: "You ordered the genuine original replacement right away. Your laptop was back online with zero disruption to your work, though an unexpected â‚¹2,500 expense tested your reserves.",
+        scoreImpact: {
+          spendingControl: +2,
+          financialAwareness: +10,
+          riskAwareness: +18,
+          emergencyPlanning: -2
+        }
+      },
+      {
+        key: 'B',
+        gesture: 'Open Palm',
+        gestureIcon: 'âœ‹',
+        title: 'Look for a cheaper compatible replacement',
+        subtitle: 'Spend â‚¹1,200',
+        cost: 1200,
+        calculateCost: (currentBalance) => 1200,
+        consequenceHeadline: 'Found a Certified Compatible Unit',
+        consequenceDescription: "You checked verified reviews and ordered a certified compatible brand charger for â‚¹1,200. It saved you â‚¹1,300 while keeping your laptop working reliably.",
+        scoreImpact: {
+          spendingControl: +15,
+          financialAwareness: +22,
+          riskAwareness: +12,
+          emergencyPlanning: +8
+        }
+      },
+      {
+        key: 'C',
+        gesture: 'Closed Fist',
+        gestureIcon: 'âœŠ',
+        title: 'Delay the purchase and find another temporary solution',
+        subtitle: 'Spend â‚¹0 (for now)',
+        cost: 0,
+        calculateCost: (currentBalance) => 0,
+        consequenceHeadline: 'Borrowed a Spare Charger',
+        consequenceDescription: "You borrowed a flatmate's extra charger during their work hours and used the office charging station. You spent â‚¹0 this month, though juggling a temporary fix added daily friction.",
+        scoreImpact: {
+          spendingControl: +10,
+          financialAwareness: +5,
+          riskAwareness: -8,
+          emergencyPlanning: +5
+        }
+      }
+    ]
+  },
+  {
+    id: 4,
+    title: 'End of Month',
+    subtitle: 'Scenario 4 of 4',
+    prompt: "You've reached the end of the month.\n\nYou still have money remaining.\n\nWhat do you do?",
+    category: 'Surplus Allocation & Long-term Habit Formation',
+    options: [
+      {
+        key: 'A',
+        gesture: 'Thumbs Up',
+        gestureIcon: 'ðŸ‘',
+        title: 'Spend it on something you want',
+        subtitle: 'Spend remaining balance',
+        cost: null, // Dynamic: spends the remaining
+        calculateCost: (currentBalance) => Math.max(0, currentBalance),
+        consequenceHeadline: 'Celebrated the Month by Splurging',
+        consequenceDescription: "You decided that first salaries are meant to be enjoyed and spent the remaining balance on shopping and an upscale dinner. You had a blast, but you enter Month 2 with zero savings safety cushion.",
+        scoreImpact: {
+          spendingControl: -22,
+          financialAwareness: -10,
+          riskAwareness: -20,
+          emergencyPlanning: -25
+        }
+      },
+      {
+        key: 'B',
+        gesture: 'Open Palm',
+        gestureIcon: 'âœ‹',
+        title: 'Save it',
+        subtitle: 'Keep 100% in savings',
+        cost: 0,
+        calculateCost: (currentBalance) => 0,
+        consequenceHeadline: 'Transferred 100% into Emergency Savings',
+        consequenceDescription: "You swept every single rupee left into a dedicated savings fund. In your very first month of earning, you've started building the financial security net most adults take years to develop.",
+        scoreImpact: {
+          spendingControl: +22,
+          financialAwareness: +20,
+          riskAwareness: +25,
+          emergencyPlanning: +30
+        }
+      },
+      {
+        key: 'C',
+        gesture: 'Closed Fist',
+        gestureIcon: 'âœŠ',
+        title: 'Split it between saving and spending',
+        subtitle: 'Save 50%, spend 50%',
+        cost: null, // Dynamic: spends 50% of remaining
+        calculateCost: (currentBalance) => Math.round(Math.max(0, currentBalance) * 0.5),
+        consequenceHeadline: 'Balanced Reward & Future Security',
+        consequenceDescription: "The sustainable adult approach! You celebrated your hard work with half of the surplus, while banking the other 50% into savings. You enjoyed your first salary without sacrificing your future.",
+        scoreImpact: {
+          spendingControl: +14,
+          financialAwareness: +25,
+          riskAwareness: +15,
+          emergencyPlanning: +16
+        }
+      }
+    ]
+  }
+];
+
+// Export to window for vanilla browser execution
+window.LIFE_SCENARIOS = {
+  INITIAL_FINANCES,
+  SCENARIOS,
+  formatINR
+};
+
+
+  /**
+ * LIFE 18/25 - Life Decision Profile Calculator & Scoring Engine
+ */
+
+const PILLAR_DEFINITIONS = {
+  financialAwareness: {
+    name: 'Financial Awareness',
+    icon: 'ðŸ’¡',
+    description: 'Understanding opportunity costs, value vs price, and how daily spending decisions compound.',
+    strengths: [
+      'You demonstrate a keen sense of value trade-offs, prioritizing cost-efficiency and smart compromises rather than binary all-or-nothing spending.'
+    ],
+    improvements: [
+      'Consider exploring price-to-utility ratios before making purchases. Finding balanced mid-tier options can satisfy your needs without depleting your core funds.'
+    ]
+  },
+  spendingControl: {
+    name: 'Spending Control',
+    icon: 'ðŸ›¡ï¸',
+    description: 'The ability to withstand impulsive triggers, social peer pressure, and instant gratification.',
+    strengths: [
+      'You show impressive impulse discipline. You donâ€™t let lifestyle inflation or spur-of-the-moment desires overtake your monthly budget.'
+    ],
+    improvements: [
+      'Practice the 48-hour rule for non-essential purchases above â‚¹1,000. Delaying an impulse purchase by two days cuts unnecessary spending dramatically.'
+    ]
+  },
+  riskAwareness: {
+    name: 'Risk Awareness',
+    icon: 'âš¡',
+    description: 'Anticipating unforeseen life hurdles and avoiding vulnerability to single points of failure.',
+    strengths: [
+      'You are mindful of unexpected disruptions and avoid running your bank account down to the wire, safeguarding yourself against surprise shocks.'
+    ],
+    improvements: [
+      'Keep in mind that unexpected hiccups (device repairs, travel emergencies) inevitably occur every few months. Budgeting a mini emergency line item helps absorb them stress-free.'
+    ]
+  },
+  emergencyPlanning: {
+    name: 'Emergency Planning',
+    icon: 'ðŸŒ±',
+    description: 'Building a reliable financial safety net to ensure stability for subsequent months.',
+    strengths: [
+      'You prioritize building a solid financial foundation early, giving yourself peace of mind and resilience as an independent adult.'
+    ],
+    improvements: [
+      'Aim to tuck away even 10%â€“15% of your discretionary income every payday before starting your discretionary spending (Pay Yourself First).'
+    ]
+  }
+};
+
+function calculateProfile(choices, finalBalance, totalSpent) {
+  // Base score starting at 50 for balanced baseline
+  const scores = {
+    financialAwareness: 50,
+    spendingControl: 50,
+    riskAwareness: 50,
+    emergencyPlanning: 50
+  };
+
+  // Tally deltas from choices
+  choices.forEach(c => {
+    if (c.option && c.option.scoreImpact) {
+      Object.keys(c.option.scoreImpact).forEach(pillar => {
+        if (scores[pillar] !== undefined) {
+          scores[pillar] += c.option.scoreImpact[pillar];
+        }
+      });
+    }
+  });
+
+  // Additional balance bonus / penalty for emergency planning & risk awareness
+  if (finalBalance >= 10000) {
+    scores.emergencyPlanning += 10;
+    scores.riskAwareness += 8;
+  } else if (finalBalance >= 5000) {
+    scores.emergencyPlanning += 4;
+    scores.riskAwareness += 4;
+  } else if (finalBalance <= 1000) {
+    scores.emergencyPlanning -= 8;
+    scores.riskAwareness -= 10;
+  }
+
+  // Clamp scores between 25 and 96 to stay realistic, educational, and positive
+  Object.keys(scores).forEach(pillar => {
+    scores[pillar] = Math.max(25, Math.min(96, Math.round(scores[pillar])));
+  });
+
+  // Identify strongest area and area to improve
+  const sortedPillars = Object.keys(scores).sort((a, b) => scores[b] - scores[a]);
+  const strongestKey = sortedPillars[0];
+  let improveKey = sortedPillars[sortedPillars.length - 1];
+
+  // If top and bottom are identical, pick a distinct one
+  if (improveKey === strongestKey && sortedPillars.length > 1) {
+    improveKey = sortedPillars[1];
+  }
+
+  const strongest = {
+    key: strongestKey,
+    name: PILLAR_DEFINITIONS[strongestKey].name,
+    icon: PILLAR_DEFINITIONS[strongestKey].icon,
+    score: scores[strongestKey],
+    feedback: PILLAR_DEFINITIONS[strongestKey].strengths[0]
+  };
+
+  const improve = {
+    key: improveKey,
+    name: PILLAR_DEFINITIONS[improveKey].name,
+    icon: PILLAR_DEFINITIONS[improveKey].icon,
+    score: scores[improveKey],
+    feedback: PILLAR_DEFINITIONS[improveKey].improvements[0]
+  };
+
+  // Overall persona archetype summary
+  let personaTitle = 'Balanced Navigator';
+  let personaSubtitle = 'You weigh enjoyment today with sensible preparedness for tomorrow.';
+  
+  const avgScore = (scores.financialAwareness + scores.spendingControl + scores.riskAwareness + scores.emergencyPlanning) / 4;
+  if (scores.emergencyPlanning >= 75 && scores.spendingControl >= 75) {
+    personaTitle = 'The Fortified Planner';
+    personaSubtitle = 'You demonstrate extraordinary financial discipline and prioritize future security.';
+  } else if (scores.financialAwareness >= 75 && finalBalance > 4000) {
+    personaTitle = 'The Strategic Optimizer';
+    personaSubtitle = 'You excel at finding clever compromises and maximizing value per rupee spent.';
+  } else if (avgScore < 50) {
+    personaTitle = 'The Spontaneous Explorer';
+    personaSubtitle = 'You prioritize in-the-moment living; building a small automated safety buffer will give you even greater freedom.';
+  }
+
+  return {
+    scores,
+    pillars: PILLAR_DEFINITIONS,
+    strongest,
+    improve,
+    personaTitle,
+    personaSubtitle,
+    avgScore: Math.round(avgScore),
+    finalBalance,
+    totalSpent,
+    totalSaved: finalBalance
+  };
+}
+
+window.LIFE_PROFILE = {
+  PILLAR_DEFINITIONS,
+  calculateProfile
+};
+
+
+  /**
+ * LIFE 18/25 - Teachable Machine Gesture Recognition Engine
+ * Integrates Google Teachable Machine Image Model & Webcam with hold-confirmation and fallbacks
+ */
+
+(function () {
+  // Default path as specified by Teachable Machine export panel
+  let URL = "./my_model/";
+
+  let model = null;
+  let webcam = null;
+  let maxPredictions = 0;
+  let isRunning = false;
+  let isDetectionActive = true;
+  let currentTopGesture = null;
+  let holdStartTime = null;
+  const HOLD_DURATION_MS = 1200; // 1.2 seconds stable hold to confirm
+  const CONFIDENCE_THRESHOLD = 0.78; // 78% minimum confidence
+
+  let onGestureConfirmedCallback = null;
+  let onPredictionUpdateCallback = null;
+  let isSimulationMode = false;
+
+  // Gesture mapping dictionary
+  const GESTURE_MAP = {
+    A: { key: 'A', name: 'Thumbs Up', icon: 'ðŸ‘' },
+    B: { key: 'B', name: 'Open Palm', icon: 'âœ‹' },
+    C: { key: 'C', name: 'Closed Fist', icon: 'âœŠ' }
+  };
+
+  /**
+   * Determine which choice (A, B, C, or Neutral) a class name corresponds to
+   */
+  function mapClassNameToOption(className, index) {
+    if (!className) return null;
+    const lower = className.toLowerCase().trim();
+
+    // Check for neutral/background/idle
+    if (lower.includes('neutral') || lower.includes('background') || lower.includes('idle') || lower.includes('none') || lower.includes('rest')) {
+      return null;
+    }
+
+    // Option A: Thumbs Up
+    if (lower.includes('thumb') || lower.includes('up') || lower === 'option a' || lower === 'a' || lower.includes('thumbs')) {
+      return 'A';
+    }
+
+    // Option B: Open Palm
+    if (lower.includes('palm') || lower.includes('open') || lower.includes('hand') || lower === 'option b' || lower === 'b') {
+      return 'B';
+    }
+
+    // Option C: Closed Fist
+    if (lower.includes('fist') || lower.includes('closed') || lower.includes('punch') || lower === 'option c' || lower === 'c') {
+      return 'C';
+    }
+
+    // Fallback based on class index (Class 0 -> A, Class 1 -> B, Class 2 -> C)
+    if (index === 0) return 'A';
+    if (index === 1) return 'B';
+    if (index === 2) return 'C';
+
+    return null;
+  }
+
+  /**
+   * Load the Teachable Machine image model and initialize the webcam.
+   * Directly follows the supplied Teachable Machine API pattern.
+   */
+  async function init(customModelUrl = null, modelFiles = null) {
+    if (customModelUrl) {
+      URL = customModelUrl.endsWith('/') ? customModelUrl : customModelUrl + '/';
+    }
+
+    const statusEl = document.getElementById('camera-status-text');
+    if (statusEl) statusEl.textContent = 'Loading gesture model...';
+
+    try {
+      // 1. Load the model and metadata
+      if (modelFiles && modelFiles.model && modelFiles.metadata && modelFiles.weights) {
+        // Support files from file picker
+        model = await tmImage.loadFromFiles(modelFiles.model, modelFiles.weights, modelFiles.metadata);
+      } else {
+        const modelURL = URL + "model.json";
+        const metadataURL = URL + "metadata.json";
+        model = await tmImage.load(modelURL, metadataURL);
+      }
+
+      maxPredictions = model.getTotalClasses();
+      console.log(`[LIFE 18/25] Teachable Machine model loaded successfully with ${maxPredictions} classes.`);
+
+      // Update model badge
+      updateModelStatusBadge(true, 'TM Model Loaded');
+    } catch (err) {
+      console.warn('[LIFE 18/25] Could not load local model from ' + URL, err);
+      updateModelStatusBadge(false, 'Model Not Found');
+      // Prompt user or offer fallback without crashing the app
+      showModelMissingNotice(err.message);
+    }
+
+    // 2. Setup webcam
+    try {
+      if (!webcam) {
+        const flip = true; // Flip webcam horizontally for natural mirror feel
+        const width = 240;
+        const height = 240;
+        webcam = new tmImage.Webcam(width, height, flip);
+
+        if (statusEl) statusEl.textContent = 'Requesting camera access...';
+        await webcam.setup(); // Request access to the webcam
+        await webcam.play();
+
+        const container = document.getElementById("webcam-container");
+        if (container) {
+          container.innerHTML = '';
+          container.appendChild(webcam.canvas);
+        }
+      }
+
+      isRunning = true;
+      window.requestAnimationFrame(loop);
+
+      if (statusEl) statusEl.textContent = 'Show your choice to the camera';
+      return true;
+    } catch (cameraErr) {
+      console.error('[LIFE 18/25] Webcam access failed or denied:', cameraErr);
+      if (statusEl) statusEl.textContent = 'Camera unavailable. You can click options or use keys A, B, C.';
+      showCameraErrorNotice(cameraErr);
+      return false;
+    }
+  }
+
+  /**
+   * Main animation and prediction loop
+   */
+  async function loop() {
+    if (!isRunning) return;
+
+    if (webcam) {
+      webcam.update(); // Update the webcam frame
+      if (isDetectionActive) {
+        await predict();
+      }
+    }
+
+    window.requestAnimationFrame(loop);
+  }
+
+  /**
+   * Run the webcam image through the image model and evaluate gesture confidence
+   */
+  async function predict() {
+    if (!model && !isSimulationMode) return;
+
+    let topPrediction = null;
+    let highestProb = 0;
+    let predictionsArray = [];
+
+    if (model) {
+      const predictions = await model.predict(webcam.canvas);
+      predictionsArray = predictions;
+
+      for (let i = 0; i < maxPredictions; i++) {
+        const optionKey = mapClassNameToOption(predictions[i].className, i);
+        const prob = predictions[i].probability;
+
+        if (optionKey && prob > highestProb) {
+          highestProb = prob;
+          topPrediction = {
+            className: predictions[i].className,
+            optionKey: optionKey,
+            probability: prob,
+            gestureName: GESTURE_MAP[optionKey].name,
+            icon: GESTURE_MAP[optionKey].icon
+          };
+        }
+      }
+    } else if (isSimulationMode && simulatedGesture) {
+      // Simulation mode fallback
+      highestProb = simulatedConfidence;
+      topPrediction = {
+        className: simulatedGesture.name,
+        optionKey: simulatedGesture.key,
+        probability: simulatedConfidence,
+        gestureName: simulatedGesture.name,
+        icon: simulatedGesture.icon
+      };
+    }
+
+    // Pass predictions to UI callback
+    if (onPredictionUpdateCallback) {
+      onPredictionUpdateCallback(predictionsArray, topPrediction);
+    }
+
+    // Process top prediction stability
+    processGestureDetection(topPrediction, highestProb);
+  }
+
+  /**
+   * Evaluates if a gesture is detected stably with high confidence
+   */
+  function processGestureDetection(topPrediction, probability) {
+    const feedbackPill = document.getElementById('detected-gesture-pill');
+    const holdProgressFill = document.getElementById('hold-progress-fill');
+    const statusText = document.getElementById('camera-status-text');
+
+    if (topPrediction && probability >= CONFIDENCE_THRESHOLD) {
+      const percent = Math.round(probability * 100);
+      const optionKey = topPrediction.optionKey;
+      const gestureName = topPrediction.gestureName;
+
+      // Update feedback text e.g.: "Detected: Thumbs Up â€” 94% confidence"
+      if (feedbackPill) {
+        feedbackPill.classList.remove('hidden');
+        feedbackPill.innerHTML = `
+          <span class="detect-icon">${topPrediction.icon}</span>
+          <span class="detect-text">Detected: <strong>${gestureName}</strong> (Option ${optionKey}) â€” <strong>${percent}%</strong> confidence</span>
+        `;
+      }
+
+      if (statusText) {
+        statusText.textContent = `Holding ${gestureName}... Keep steady`;
+      }
+
+      // Check hold stability
+      if (currentTopGesture === optionKey) {
+        const elapsed = Date.now() - holdStartTime;
+        const progress = Math.min(100, (elapsed / HOLD_DURATION_MS) * 100);
+
+        if (holdProgressFill) {
+          holdProgressFill.style.width = progress + '%';
+        }
+
+        // Highlight the corresponding card in the UI
+        highlightOptionCard(optionKey, progress);
+
+        if (elapsed >= HOLD_DURATION_MS) {
+          // Confirm Choice!
+          confirmGestureChoice(optionKey, gestureName, percent);
+        }
+      } else {
+        // New gesture detected
+        currentTopGesture = optionKey;
+        holdStartTime = Date.now();
+        if (holdProgressFill) {
+          holdProgressFill.style.width = '0%';
+        }
+        highlightOptionCard(optionKey, 0);
+      }
+    } else {
+      // Low confidence or neutral
+      currentTopGesture = null;
+      holdStartTime = null;
+
+      if (holdProgressFill) {
+        holdProgressFill.style.width = '0%';
+      }
+
+      clearOptionHighlights();
+
+      if (feedbackPill) {
+        if (topPrediction && probability > 0.4) {
+          const percent = Math.round(probability * 100);
+          feedbackPill.classList.remove('hidden');
+          feedbackPill.innerHTML = `
+            <span class="detect-icon">ðŸ‘€</span>
+            <span class="detect-text">Detecting ${topPrediction.gestureName} (${percent}%) â€” raise hand closer</span>
+          `;
+        } else {
+          feedbackPill.classList.add('hidden');
+        }
+      }
+
+      if (statusText) {
+        statusText.textContent = 'Show your choice to the camera';
+      }
+    }
+  }
+
+  /**
+   * Finalize the choice automatically after stable hold
+   */
+  function confirmGestureChoice(optionKey, gestureName, confidence) {
+    if (!isDetectionActive) return;
+
+    // Lock detection
+    isDetectionActive = false;
+    currentTopGesture = null;
+    holdStartTime = null;
+
+    const statusText = document.getElementById('camera-status-text');
+    if (statusText) {
+      statusText.innerHTML = `<span style="color: var(--accent-emerald);">âœ“ Confirmed: Option ${optionKey} (${gestureName})</span>`;
+    }
+
+    const holdProgressFill = document.getElementById('hold-progress-fill');
+    if (holdProgressFill) {
+      holdProgressFill.style.width = '100%';
+      holdProgressFill.classList.add('confirmed');
+    }
+
+    // Optional audio confirmation chime
+    playChime();
+
+    // Trigger external handler after brief visual confirmation
+    setTimeout(() => {
+      if (onGestureConfirmedCallback) {
+        onGestureConfirmedCallback(optionKey, gestureName, confidence);
+      }
+      if (holdProgressFill) {
+        holdProgressFill.classList.remove('confirmed');
+        holdProgressFill.style.width = '0%';
+      }
+    }, 450);
+  }
+
+  function playChime() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15); // A5
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.25);
+    } catch (e) {
+      // Audio not permitted or unsupported, silent fail
+    }
+  }
+
+  function highlightOptionCard(optionKey, progress) {
+    ['A', 'B', 'C'].forEach(key => {
+      const card = document.getElementById(`option-card-${key}`);
+      if (!card) return;
+      if (key === optionKey) {
+        card.classList.add('gesture-targeted');
+        card.style.setProperty('--hold-progress', `${progress}%`);
+      } else {
+        card.classList.remove('gesture-targeted');
+        card.style.removeProperty('--hold-progress');
+      }
+    });
+  }
+
+  function clearOptionHighlights() {
+    ['A', 'B', 'C'].forEach(key => {
+      const card = document.getElementById(`option-card-${key}`);
+      if (card) {
+        card.classList.remove('gesture-targeted');
+        card.style.removeProperty('--hold-progress');
+      }
+    });
+  }
+
+  function resetDetection() {
+    isDetectionActive = true;
+    currentTopGesture = null;
+    holdStartTime = null;
+    clearOptionHighlights();
+
+    const holdProgressFill = document.getElementById('hold-progress-fill');
+    if (holdProgressFill) holdProgressFill.style.width = '0%';
+
+    const feedbackPill = document.getElementById('detected-gesture-pill');
+    if (feedbackPill) feedbackPill.classList.add('hidden');
+
+    const statusText = document.getElementById('camera-status-text');
+    if (statusText) statusText.textContent = 'Show your choice to the camera';
+  }
+
+  function setDetectionActive(active) {
+    isDetectionActive = active;
+    if (!active) {
+      clearOptionHighlights();
+    }
+  }
+
+  function onGestureConfirmed(fn) {
+    onGestureConfirmedCallback = fn;
+  }
+
+  function onPredictionUpdate(fn) {
+    onPredictionUpdateCallback = fn;
+  }
+
+  function updateModelStatusBadge(isSuccess, label) {
+    const badge = document.getElementById('model-status-badge');
+    if (badge) {
+      badge.textContent = label;
+      badge.className = isSuccess ? 'status-badge active' : 'status-badge warning';
+    }
+  }
+
+  function showModelMissingNotice(errMsg) {
+    const banner = document.getElementById('model-alert-banner');
+    if (banner) {
+      banner.classList.remove('hidden');
+    }
+  }
+
+  function showCameraErrorNotice(err) {
+    const errorBox = document.getElementById('camera-error-box');
+    if (errorBox) {
+      errorBox.classList.remove('hidden');
+      errorBox.innerHTML = `
+        <div class="camera-error-content">
+          <strong>Camera Permission Notice</strong>
+          <p>Camera access was blocked or is unavailable (${err.name || 'Error'}). You can continue the simulation using the on-screen option cards or keyboard keys <strong>A</strong>, <strong>B</strong>, and <strong>C</strong>.</p>
+        </div>
+      `;
+    }
+  }
+
+  // Simulation mode support for seamless testing if no model files exist
+  let simulatedGesture = null;
+  let simulatedConfidence = 0.94;
+
+  function simulateGesture(optionKey) {
+    if (!optionKey) {
+      simulatedGesture = null;
+      return;
+    }
+    isSimulationMode = true;
+    simulatedGesture = GESTURE_MAP[optionKey];
+    simulatedConfidence = 0.93 + Math.random() * 0.05;
+  }
+
+  function stopSimulation() {
+    isSimulationMode = false;
+    simulatedGesture = null;
+    resetDetection();
+  }
+
+  // Export to window
+  window.LIFE_GESTURE = {
+    init,
+    resetDetection,
+    setDetectionActive,
+    onGestureConfirmed,
+    onPredictionUpdate,
+    simulateGesture,
+    stopSimulation,
+    confirmGestureChoice,
+    GESTURE_MAP
+  };
+})();
+
+
+  /**
+ * LIFE 18/25 - Core Application Orchestrator & State Machine
+ */
+
+(function () {
+  // Application State
+  const state = {
+    screen: 'landing', // 'landing' | 'salary-intro' | 'simulation' | 'result'
+    currentScenarioIndex: 0,
+    grossSalary: 30000,
+    totalFixed: 15000,
+    discretionaryBalance: 15000,
+    totalSpent: 0,
+    choicesHistory: [],
+    isProcessingChoice: false,
+    cameraInitialized: false
+  };
+
+  // DOM Elements cache
+  let screens = {};
+  let elements = {};
+
+  function initApp() {
+    cacheDOMElements();
+    bindEvents();
+    renderFixedExpensesList();
+    showScreen('landing');
+    console.log('[LIFE 18/25] Application ready.');
+  }
+
+  function cacheDOMElements() {
+    screens = {
+      landing: document.getElementById('screen-landing'),
+      salaryIntro: document.getElementById('screen-salary-intro'),
+      simulation: document.getElementById('screen-simulation'),
+      result: document.getElementById('screen-result')
+    };
+
+    elements = {
+      // Top Ticker / Header
+      headerBalance: document.getElementById('header-balance-value'),
+      headerSpent: document.getElementById('header-spent-value'),
+      progressDots: document.getElementById('progress-dots'),
+      scenarioCounterText: document.getElementById('scenario-counter-text'),
+
+      // Salary Intro Screen
+      fixedExpensesList: document.getElementById('fixed-expenses-list'),
+      btnProceedToSim: document.getElementById('btn-proceed-to-sim'),
+
+      // Simulation Screen
+      scenarioCategoryBadge: document.getElementById('scenario-category-badge'),
+      scenarioTitle: document.getElementById('scenario-title'),
+      scenarioPrompt: document.getElementById('scenario-prompt'),
+      optionsContainer: document.getElementById('options-container'),
+      retryGestureBtn: document.getElementById('btn-retry-gesture'),
+
+      // Consequence Overlay
+      consequenceModal: document.getElementById('consequence-modal'),
+      consequenceIcon: document.getElementById('consequence-icon'),
+      consequenceHeadline: document.getElementById('consequence-headline'),
+      consequenceChoiceBadge: document.getElementById('consequence-choice-badge'),
+      consequenceDesc: document.getElementById('consequence-description'),
+      consequenceOldBalance: document.getElementById('consequence-old-balance'),
+      consequenceCost: document.getElementById('consequence-cost'),
+      consequenceNewBalance: document.getElementById('consequence-new-balance'),
+      btnNextScenario: document.getElementById('btn-next-scenario'),
+
+      // Profile Screen
+      profileArchetypeTitle: document.getElementById('profile-archetype-title'),
+      profileArchetypeSubtitle: document.getElementById('profile-archetype-subtitle'),
+      profilePillarsGrid: document.getElementById('profile-pillars-grid'),
+      profileStrongestBox: document.getElementById('profile-strongest-box'),
+      profileImproveBox: document.getElementById('profile-improve-box'),
+      profileFinalBalance: document.getElementById('profile-final-balance'),
+      profileTotalSpent: document.getElementById('profile-total-spent'),
+      profileFixedTotal: document.getElementById('profile-fixed-total'),
+      profileTimelineList: document.getElementById('profile-timeline-list'),
+      btnRestart: document.getElementById('btn-restart-sim'),
+
+      // Model Settings Modal
+      modelModal: document.getElementById('model-settings-modal'),
+      btnOpenModelModal: document.getElementById('btn-open-model-modal'),
+      btnCloseModelModal: document.getElementById('btn-close-model-modal'),
+      btnApplyCustomUrl: document.getElementById('btn-apply-custom-url'),
+      inputCustomUrl: document.getElementById('input-custom-model-url'),
+      inputFileModel: document.getElementById('file-model-json'),
+      inputFileWeights: document.getElementById('file-weights-bin'),
+      inputFileMetadata: document.getElementById('file-metadata-json'),
+      btnUploadFiles: document.getElementById('btn-upload-model-files'),
+      btnEnableSimMode: document.getElementById('btn-enable-sim-mode')
+    };
+  }
+
+  function bindEvents() {
+    // Landing screen CTA
+    const btnStart = document.getElementById('btn-start-simulation');
+    if (btnStart) {
+      btnStart.addEventListener('click', () => {
+        showScreen('salaryIntro');
+        // Pre-initialize camera in parallel
+        initWebcamAndModel();
+      });
+    }
+
+    // Salary Intro to First Scenario
+    if (elements.btnProceedToSim) {
+      elements.btnProceedToSim.addEventListener('click', () => {
+        startFirstScenario();
+      });
+    }
+
+    // Consequence modal "Continue" button
+    if (elements.btnNextScenario) {
+      elements.btnNextScenario.addEventListener('click', () => {
+        advanceAfterConsequence();
+      });
+    }
+
+    // Restart button
+    if (elements.btnRestart) {
+      elements.btnRestart.addEventListener('click', () => {
+        restartSimulation();
+      });
+    }
+
+    // Retry Gesture button
+    if (elements.retryGestureBtn) {
+      elements.retryGestureBtn.addEventListener('click', () => {
+        window.LIFE_GESTURE.resetDetection();
+      });
+    }
+
+    // Teachable Machine Gesture Callback
+    window.LIFE_GESTURE.onGestureConfirmed((optionKey, gestureName, confidence) => {
+      if (state.screen === 'simulation' && !state.isProcessingChoice) {
+        selectOption(optionKey, gestureName, confidence);
+      }
+    });
+
+    // Model settings modal triggers
+    if (elements.btnOpenModelModal) {
+      elements.btnOpenModelModal.addEventListener('click', () => openModelModal());
+    }
+    if (elements.btnCloseModelModal) {
+      elements.btnCloseModelModal.addEventListener('click', () => closeModelModal());
+    }
+
+    // Model custom URL
+    if (elements.btnApplyCustomUrl) {
+      elements.btnApplyCustomUrl.addEventListener('click', async () => {
+        const url = elements.inputCustomUrl.value.trim();
+        if (url) {
+          elements.btnApplyCustomUrl.textContent = 'Loading URL...';
+          await window.LIFE_GESTURE.init(url);
+          elements.btnApplyCustomUrl.textContent = 'Loaded!';
+          setTimeout(() => {
+            closeModelModal();
+            elements.btnApplyCustomUrl.textContent = 'Apply URL';
+          }, 800);
+        }
+      });
+    }
+
+    // Upload local model files
+    if (elements.btnUploadFiles) {
+      elements.btnUploadFiles.addEventListener('click', async () => {
+        const modelFile = elements.inputFileModel.files[0];
+        const weightsFile = elements.inputFileWeights.files[0];
+        const metaFile = elements.inputFileMetadata.files[0];
+
+        if (modelFile && weightsFile && metaFile) {
+          elements.btnUploadFiles.textContent = 'Uploading...';
+          await window.LIFE_GESTURE.init(null, {
+            model: modelFile,
+            weights: weightsFile,
+            metadata: metaFile
+          });
+          elements.btnUploadFiles.textContent = 'Loaded Model Files!';
+          setTimeout(() => {
+            closeModelModal();
+            elements.btnUploadFiles.textContent = 'Load Selected Files';
+          }, 800);
+        } else {
+          alert('Please select all 3 files: model.json, weights.bin, and metadata.json.');
+        }
+      });
+    }
+
+    // Interactive gesture test buttons in simulation mode
+    document.querySelectorAll('.sim-gesture-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const gesture = btn.dataset.gesture;
+        window.LIFE_GESTURE.simulateGesture(gesture);
+      });
+    });
+
+    // Keyboard Shortcuts (A, B, C for quick testing & accessibility)
+    window.addEventListener('keydown', (e) => {
+      if (state.screen === 'simulation' && !state.isProcessingChoice) {
+        const key = e.key.toUpperCase();
+        if (key === 'A' || key === 'B' || key === 'C') {
+          const gestureName = window.LIFE_GESTURE.GESTURE_MAP[key].name;
+          selectOption(key, gestureName, 100);
+        }
+      } else if (state.screen === 'consequence' || (elements.consequenceModal && !elements.consequenceModal.classList.contains('hidden'))) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          advanceAfterConsequence();
+        }
+      }
+    });
+  }
+
+  function showScreen(screenKey) {
+    state.screen = screenKey;
+    Object.keys(screens).forEach(key => {
+      if (screens[key]) {
+        if (key === screenKey) {
+          screens[key].classList.remove('hidden');
+          screens[key].classList.add('active');
+        } else {
+          screens[key].classList.add('hidden');
+          screens[key].classList.remove('active');
+        }
+      }
+    });
+
+    // Update visibility of header ticker
+    const header = document.getElementById('app-header');
+    if (header) {
+      if (screenKey === 'simulation' || screenKey === 'salaryIntro') {
+        header.classList.remove('hidden');
+      } else {
+        header.classList.add('hidden');
+      }
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async function initWebcamAndModel() {
+    if (state.cameraInitialized) return;
+    state.cameraInitialized = true;
+    try {
+      await window.LIFE_GESTURE.init();
+    } catch (e) {
+      console.warn('[LIFE 18/25] Initial camera/model init warning:', e);
+    }
+  }
+
+  function renderFixedExpensesList() {
+    if (!elements.fixedExpensesList) return;
+    const { fixedExpenses, totalFixed, grossSalary, initialRemaining } = window.LIFE_SCENARIOS.INITIAL_FINANCES;
+
+    let html = '';
+    fixedExpenses.forEach(item => {
+      html += `
+        <div class="fixed-item">
+          <div class="fixed-item-left">
+            <span class="fixed-item-icon">${item.icon}</span>
+            <span class="fixed-item-label">${item.label}</span>
+          </div>
+          <span class="fixed-item-amount">${window.LIFE_SCENARIOS.formatINR(item.amount)}</span>
+        </div>
+      `;
+    });
+
+    elements.fixedExpensesList.innerHTML = html;
+
+    const totalFixedEl = document.getElementById('intro-total-fixed');
+    if (totalFixedEl) totalFixedEl.textContent = window.LIFE_SCENARIOS.formatINR(totalFixed);
+
+    const introRemainingEl = document.getElementById('intro-remaining-amount');
+    if (introRemainingEl) introRemainingEl.textContent = window.LIFE_SCENARIOS.formatINR(initialRemaining);
+  }
+
+  function startFirstScenario() {
+    state.currentScenarioIndex = 0;
+    state.discretionaryBalance = window.LIFE_SCENARIOS.INITIAL_FINANCES.initialRemaining;
+    state.totalSpent = 0;
+    state.choicesHistory = [];
+    state.isProcessingChoice = false;
+
+    updateHeaderBalances();
+    renderScenario(state.currentScenarioIndex);
+    showScreen('simulation');
+    window.LIFE_GESTURE.resetDetection();
+    window.LIFE_GESTURE.setDetectionActive(true);
+  }
+
+  function renderScenario(index) {
+    const scenario = window.LIFE_SCENARIOS.SCENARIOS[index];
+    if (!scenario) return;
+
+    state.isProcessingChoice = false;
+
+    // Update Progress Indicator
+    updateProgressIndicator(index);
+
+    // Update Category & Titles
+    if (elements.scenarioCategoryBadge) elements.scenarioCategoryBadge.textContent = scenario.category;
+    if (elements.scenarioTitle) elements.scenarioTitle.textContent = `${scenario.title}`;
+    if (elements.scenarioCounterText) elements.scenarioCounterText.textContent = `Scenario ${index + 1} of 4`;
+
+    // Format prompt text with proper line breaks
+    if (elements.scenarioPrompt) {
+      const formattedPrompt = scenario.prompt.split('\n\n').map(p => `<p>${p}</p>`).join('');
+      elements.scenarioPrompt.innerHTML = formattedPrompt;
+    }
+
+    // Render 3 Option Cards
+    if (elements.optionsContainer) {
+      let optionsHtml = '';
+      scenario.options.forEach(opt => {
+        const cost = opt.calculateCost(state.discretionaryBalance);
+        const costDisplay = cost > 0 ? `-${window.LIFE_SCENARIOS.formatINR(cost)}` : 'â‚¹0 cost';
+
+        optionsHtml += `
+          <div class="option-card" id="option-card-${opt.key}" data-key="${opt.key}">
+            <div class="option-card-progress-bar"></div>
+            <div class="option-card-header">
+              <div class="option-key-badge">Option ${opt.key}</div>
+              <div class="option-gesture-tag">
+                <span class="gesture-icon">${opt.gestureIcon}</span>
+                <span class="gesture-name">${opt.gesture}</span>
+              </div>
+            </div>
+            <div class="option-card-body">
+              <h3 class="option-title">${opt.title}</h3>
+              <p class="option-subtitle">${opt.subtitle}</p>
+            </div>
+            <div class="option-card-footer">
+              <span class="option-cost-tag ${cost === 0 ? 'free' : ''}">${costDisplay}</span>
+              <span class="option-gesture-instruction">Show <strong>${opt.gestureIcon} ${opt.gesture}</strong> to camera</span>
+            </div>
+          </div>
+        `;
+      });
+
+      elements.optionsContainer.innerHTML = optionsHtml;
+
+      // Allow clicking option card as manual fallback
+      document.querySelectorAll('.option-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const key = card.dataset.key;
+          const opt = scenario.options.find(o => o.key === key);
+          if (opt && !state.isProcessingChoice) {
+            selectOption(key, opt.gesture, 100);
+          }
+        });
+      });
+    }
+
+    updateHeaderBalances();
+  }
+
+  function updateProgressIndicator(currentIndex) {
+    if (!elements.progressDots) return;
+    let dotsHtml = '';
+    for (let i = 0; i < 4; i++) {
+      let statusClass = '';
+      if (i < currentIndex) statusClass = 'completed';
+      else if (i === currentIndex) statusClass = 'active';
+      dotsHtml += `<div class="progress-dot ${statusClass}" title="Scenario ${i + 1}"><span>${i + 1}</span></div>`;
+    }
+    elements.progressDots.innerHTML = dotsHtml;
+  }
+
+  function updateHeaderBalances() {
+    if (elements.headerBalance) {
+      elements.headerBalance.textContent = window.LIFE_SCENARIOS.formatINR(state.discretionaryBalance);
+      // Visual pulse
+      elements.headerBalance.classList.add('pulse');
+      setTimeout(() => elements.headerBalance.classList.remove('pulse'), 400);
+    }
+    if (elements.headerSpent) {
+      elements.headerSpent.textContent = window.LIFE_SCENARIOS.formatINR(state.totalSpent);
+    }
+  }
+
+  function selectOption(optionKey, gestureName, confidence) {
+    if (state.isProcessingChoice) return;
+    state.isProcessingChoice = true;
+
+    window.LIFE_GESTURE.setDetectionActive(false);
+
+    const scenario = window.LIFE_SCENARIOS.SCENARIOS[state.currentScenarioIndex];
+    const selectedOption = scenario.options.find(o => o.key === optionKey);
+    if (!selectedOption) return;
+
+    const previousBalance = state.discretionaryBalance;
+    const cost = selectedOption.calculateCost(previousBalance);
+    const newBalance = Math.max(0, previousBalance - cost);
+
+    // Apply financial consequences
+    state.discretionaryBalance = newBalance;
+    state.totalSpent += cost;
+
+    // Record decision in history
+    state.choicesHistory.push({
+      scenarioIndex: state.currentScenarioIndex,
+      scenarioId: scenario.id,
+      scenarioTitle: scenario.title,
+      option: selectedOption,
+      optionKey: optionKey,
+      gestureName: gestureName,
+      confidence: confidence,
+      previousBalance,
+      cost,
+      newBalance
+    });
+
+    updateHeaderBalances();
+
+    // Show Consequence Modal
+    showConsequenceModal({
+      scenario,
+      option: selectedOption,
+      previousBalance,
+      cost,
+      newBalance,
+      gestureName,
+      confidence
+    });
+  }
+
+  function showConsequenceModal(data) {
+    const { scenario, option, previousBalance, cost, newBalance, gestureName, confidence } = data;
+
+    if (elements.consequenceIcon) elements.consequenceIcon.textContent = option.gestureIcon;
+    if (elements.consequenceHeadline) elements.consequenceHeadline.textContent = option.consequenceHeadline;
+    if (elements.consequenceChoiceBadge) {
+      elements.consequenceChoiceBadge.innerHTML = `
+        <span>Detected via <strong>${gestureName}</strong> (${confidence}% confidence)</span>
+        <span class="badge-dot"></span>
+        <span>Option ${option.key}: ${option.title}</span>
+      `;
+    }
+    if (elements.consequenceDesc) elements.consequenceDesc.textContent = option.consequenceDescription;
+
+    if (elements.consequenceOldBalance) elements.consequenceOldBalance.textContent = window.LIFE_SCENARIOS.formatINR(previousBalance);
+    if (elements.consequenceCost) elements.consequenceCost.textContent = cost > 0 ? `-${window.LIFE_SCENARIOS.formatINR(cost)}` : 'â‚¹0';
+    if (elements.consequenceNewBalance) elements.consequenceNewBalance.textContent = window.LIFE_SCENARIOS.formatINR(newBalance);
+
+    if (elements.btnNextScenario) {
+      if (state.currentScenarioIndex === 3) {
+        elements.btnNextScenario.innerHTML = `View Your Decision Profile <span class="arrow">â†’</span>`;
+      } else {
+        elements.btnNextScenario.innerHTML = `Continue to Scenario ${state.currentScenarioIndex + 2} <span class="arrow">â†’</span>`;
+      }
+    }
+
+    if (elements.consequenceModal) {
+      elements.consequenceModal.classList.remove('hidden');
+    }
+  }
+
+  function advanceAfterConsequence() {
+    if (elements.consequenceModal) {
+      elements.consequenceModal.classList.add('hidden');
+    }
+
+    if (state.currentScenarioIndex < 3) {
+      state.currentScenarioIndex++;
+      renderScenario(state.currentScenarioIndex);
+      window.LIFE_GESTURE.resetDetection();
+      window.LIFE_GESTURE.setDetectionActive(true);
+    } else {
+      // Completed all 4 scenarios -> Render Final Result Profile!
+      window.LIFE_GESTURE.setDetectionActive(false);
+      renderProfileResults();
+      showScreen('result');
+    }
+  }
+
+  function renderProfileResults() {
+    const profile = window.LIFE_PROFILE.calculateProfile(
+      state.choicesHistory,
+      state.discretionaryBalance,
+      state.totalSpent
+    );
+
+    // Archetype headers
+    if (elements.profileArchetypeTitle) elements.profileArchetypeTitle.textContent = profile.personaTitle;
+    if (elements.profileArchetypeSubtitle) elements.profileArchetypeSubtitle.textContent = profile.personaSubtitle;
+
+    // Financial totals
+    if (elements.profileFinalBalance) elements.profileFinalBalance.textContent = window.LIFE_SCENARIOS.formatINR(profile.finalBalance);
+    if (elements.profileTotalSpent) elements.profileTotalSpent.textContent = window.LIFE_SCENARIOS.formatINR(profile.totalSpent);
+    if (elements.profileFixedTotal) elements.profileFixedTotal.textContent = window.LIFE_SCENARIOS.formatINR(state.totalFixed);
+
+    // Render 4 Pillars
+    if (elements.profilePillarsGrid) {
+      let pillarsHtml = '';
+      const pillarKeys = ['financialAwareness', 'spendingControl', 'riskAwareness', 'emergencyPlanning'];
+
+      pillarKeys.forEach(key => {
+        const score = profile.scores[key];
+        const def = profile.pillars[key];
+        let barColorClass = 'score-high';
+        if (score < 50) barColorClass = 'score-low';
+        else if (score < 70) barColorClass = 'score-mid';
+
+        pillarsHtml += `
+          <div class="pillar-card">
+            <div class="pillar-header">
+              <span class="pillar-icon">${def.icon}</span>
+              <span class="pillar-name">${def.name}</span>
+              <span class="pillar-score ${barColorClass}">${score}/100</span>
+            </div>
+            <div class="pillar-meter-bg">
+              <div class="pillar-meter-fill ${barColorClass}" style="width: ${score}%"></div>
+            </div>
+            <p class="pillar-desc">${def.description}</p>
+          </div>
+        `;
+      });
+
+      elements.profilePillarsGrid.innerHTML = pillarsHtml;
+    }
+
+    // Strongest Area
+    if (elements.profileStrongestBox) {
+      elements.profileStrongestBox.innerHTML = `
+        <div class="highlight-badge strength">â˜… Your Strongest Area</div>
+        <div class="highlight-title">
+          <span>${profile.strongest.icon}</span>
+          <h4>${profile.strongest.name} (${profile.strongest.score}/100)</h4>
+        </div>
+        <p class="highlight-feedback">${profile.strongest.feedback}</p>
+      `;
+    }
+
+    // Area to Improve
+    if (elements.profileImproveBox) {
+      elements.profileImproveBox.innerHTML = `
+        <div class="highlight-badge improve">â†— An Area You Could Improve</div>
+        <div class="highlight-title">
+          <span>${profile.improve.icon}</span>
+          <h4>${profile.improve.name} (${profile.improve.score}/100)</h4>
+        </div>
+        <p class="highlight-feedback">${profile.improve.feedback}</p>
+      `;
+    }
+
+    // Choices Timeline
+    if (elements.profileTimelineList) {
+      let timelineHtml = '';
+      state.choicesHistory.forEach((c, idx) => {
+        const costStr = c.cost > 0 ? `-${window.LIFE_SCENARIOS.formatINR(c.cost)}` : 'â‚¹0';
+        timelineHtml += `
+          <div class="timeline-row">
+            <div class="timeline-step">Scenario ${idx + 1}</div>
+            <div class="timeline-choice-info">
+              <strong>${c.scenarioTitle}</strong>
+              <div class="timeline-selection">
+                <span>${c.option.gestureIcon} Option ${c.optionKey}: ${c.option.title}</span>
+                <span class="timeline-gesture-tag">via ${c.gestureName} (${c.confidence}%)</span>
+              </div>
+            </div>
+            <div class="timeline-impact">
+              <span class="timeline-cost">${costStr}</span>
+              <span class="timeline-rem">Rem: ${window.LIFE_SCENARIOS.formatINR(c.newBalance)}</span>
+            </div>
+          </div>
+        `;
+      });
+      elements.profileTimelineList.innerHTML = timelineHtml;
+    }
+  }
+
+  function restartSimulation() {
+    state.currentScenarioIndex = 0;
+    state.discretionaryBalance = window.LIFE_SCENARIOS.INITIAL_FINANCES.initialRemaining;
+    state.totalSpent = 0;
+    state.choicesHistory = [];
+    state.isProcessingChoice = false;
+
+    showScreen('landing');
+    window.LIFE_GESTURE.resetDetection();
+    window.LIFE_GESTURE.setDetectionActive(false);
+  }
+
+  function openModelModal() {
+    if (elements.modelModal) elements.modelModal.classList.remove('hidden');
+  }
+
+  function closeModelModal() {
+    if (elements.modelModal) elements.modelModal.classList.add('hidden');
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', initApp);
+
+  window.LIFE_APP = {
+    startSimulation: () => showScreen('salaryIntro'),
+    restartSimulation,
+    selectOption
+  };
+})();
+
+  </script>
+
+</body>
+</html>
